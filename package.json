@@ -1,0 +1,23 @@
+{
+  "name": "fastify-graphql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "author": "michaelHegner",
+  "type": "module",
+  "scripts": {
+    "compile": "tsc",
+    "start": "nodemon ./src/index.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.7.1",
+    "graphql": "^16.6.0",
+    "mongodb": "^5.5.0",
+    "mongoose": "^7.2.0",
+    "nodemon": "^2.0.22"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.1",
+    "typescript": "^5.0.4"
+  }
+}
