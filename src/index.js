@@ -9,32 +9,71 @@ class CollectionFunctions {
   }
 
   async get() {
-    const res= await this.collection.find().toArray();
+    const res = await this.collection.find().toArray();
     return res;
   }
-}
+  async getSchema(){
+    const schemaObj = await this.collection.findOne()
+    function print(message){
+      console.log(message);
+    }
+    function printSchema(obj, indent) {
+        for (let key in obj) {
+            if(typeof obj[key] != "function"){     
+                let specificDataTypes=[Date,Array,Object];    
+                let type ="";
+                for(let i in specificDataTypes){       
+                  if(obj[key] instanceof specificDataTypes[i]){      
+                    type = "==is_" + specificDataTypes[i].name + "==";    
+                    break;
+                  }
+                }
+                
+                print(`${indent}${key} ${typeof obj[key]} ${type}`);
+                
+                if (typeof obj[key] == "object") {   '===='          
+                printSchema(obj[key], indent + "\t");
+              }    
+            }
+          }
+    };
+    printSchema(schemaObj,"");
+    }
+  }
 
 
 
-const client = new MongoClient("mongodb://localhost:27017/Graphql");
-const db = client.db();
 
-const collectionList = await db.collections();
-const collectionNames = collectionList.map((collection) => collection.collectionName);
+const client = new MongoClient("mongodb://localhost:27017");
+const dbName = "Graphql";
+const db = client.db(dbName);
 
-
-const cursor = collectionNames.map((collectionName) => {
+async function main() {
+  const collectionList = await db.collections();
+  const collectionNames = collectionList.map((collection) => collection.collectionName);
+  
+  const allCollections = collectionNames.map((collectionName) => {
     const collection = db.collection(collectionName);
     const cursorClass = new CollectionFunctions(collection);
     return cursorClass;
+  });
 
+  let combinedResults = [];
 
-});
+  for (let x of allCollections) {
+    const res = await x.get();
+    const schema = await x.getSchema();
+    combinedResults = [...combinedResults, ...res];
 
-console.log(cursor[0].get());
+  }
+  return combinedResults
+}
 
-// import mongoose from "mongoose";
-// let profiles;
+main()
+.then((data)=> console.log(data[0]))
+.catch((err) => console.log(err));
+  // import mongoose from "mongoose";
+  // let profiles;
 
 // main().catch((err) => console.log(err));
 
